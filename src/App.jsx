@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Camera, Link2, Download, Search, PlayCircle } from 'lucide-react';
+import { Camera, Link2, Download, Search } from 'lucide-react';
 import './index.css';
 
 function App() {
@@ -48,31 +48,23 @@ function App() {
   };
 
   return (
-    <>
-      {/* Animated Background Blobs */}
-      <div className="bg-blobs">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-      </div>
-
+    <div className="app-wrapper">
       <div className="container">
-        <header className="header" style={{ flexWrap: 'wrap', gap: '16px' }}>
+        
+        <header className="header">
           <div className="logo">
-            <Camera className="logo-icon" size={32} />
+            <Camera className="logo-icon" size={28} />
             InstaSave
-          </div>
-          <div className="copyright-badge">
-            Created by Sushant Markad
           </div>
         </header>
 
         <main className="main-content">
           <h1 className="hero-title">
-            Download High Quality<br />
-            <span>Stories, Posts & Reels</span>
+            Download <span>High Quality</span><br />
+            Stories, Posts & Reels
           </h1>
           <p className="hero-subtitle">
-            Save any public Instagram Reel, Post, or Story in maximum resolution with the original audio track intact.
+            Save any public Instagram media in maximum resolution with the original audio track intact. Fast, secure, and free.
           </p>
 
           <div className="tabs">
@@ -80,13 +72,7 @@ function App() {
               className={`tab ${activeTab === 'reels' ? 'active' : ''}`}
               onClick={() => { setActiveTab('reels'); setResult(null); setInputValue(''); }}
             >
-              Public Reels
-            </div>
-            <div 
-              className={`tab ${activeTab === 'story' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('story'); setResult(null); setInputValue(''); }}
-            >
-              Public Stories
+              Reels
             </div>
             <div 
               className={`tab ${activeTab === 'posts' ? 'active' : ''}`}
@@ -94,18 +80,24 @@ function App() {
             >
               Posts
             </div>
+            <div 
+              className={`tab ${activeTab === 'story' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('story'); setResult(null); setInputValue(''); }}
+            >
+              Stories
+            </div>
           </div>
 
-          <div className="glass-panel downloader-card">
+          <div className="downloader-card">
             <div className="input-group">
-              {activeTab === 'reels' || activeTab === 'posts' ? (
-                <Link2 className="input-icon" size={20} />
-              ) : (
+              {activeTab === 'story' ? (
                 <Search className="input-icon" size={20} />
+              ) : (
+                <Link2 className="input-icon" size={20} />
               )}
               <input 
                 type="text" 
-                className="glass-input" 
+                className="modern-input" 
                 placeholder={
                   activeTab === 'reels' ? "Paste Instagram Reel link here..." : 
                   activeTab === 'posts' ? "Paste Instagram Post link here..." :
@@ -119,7 +111,6 @@ function App() {
 
             <button 
               className="btn-primary" 
-              style={{ width: '100%' }}
               onClick={handleDownload}
               disabled={isLoading || !inputValue}
             >
@@ -134,30 +125,30 @@ function App() {
               )}
             </button>
 
-            {/* Mock Result Area */}
             {result && (
               <div className="result-area">
-                <h3 style={{ textAlign: 'left', fontSize: '1.2rem', fontWeight: 600 }}>
-                  Ready to Download
-                </h3>
+                <h3 className="result-title">Ready to Download</h3>
+                
                 {result.caption && (
-                  <p className="video-caption" style={{ textAlign: 'left', fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <p className="video-caption">
                     {result.caption}
                   </p>
                 )}
+                
                 <video 
                   className="video-preview" 
                   src={result.url} 
                   controls 
                   poster={result.thumbnail}
                 ></video>
+                
                 <a 
                   href={result.url} 
                   download={result.caption ? `${result.caption.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}.mp4` : 'Instagram_Video.mp4'}
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="btn-primary" 
-                  style={{ background: 'var(--secondary)', color: '#000', textDecoration: 'none', display: 'flex', justifyContent: 'center' }}
+                  className="btn-primary btn-download" 
+                  style={{ textDecoration: 'none' }}
                 >
                   <Download size={20} /> Save to Device
                 </a>
@@ -166,7 +157,11 @@ function App() {
           </div>
         </main>
       </div>
-    </>
+      
+      <footer className="footer">
+        <p className="copyright">Created by <span>Sushant Markad</span></p>
+      </footer>
+    </div>
   );
 }
 
