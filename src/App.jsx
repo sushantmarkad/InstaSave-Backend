@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Camera, Link2, Download, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Camera, Link2, Download, Search, X, Instagram } from 'lucide-react';
 import './index.css';
 
 function App() {
@@ -7,6 +7,22 @@ function App() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const hasSeenPopup = localStorage.getItem('hasSeenInstaPopup');
+    if (!hasSeenPopup) {
+      const timer = setTimeout(() => {
+        setShowModal(true);
+      }, 2000); // Show popup after 2 seconds
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const closePopup = () => {
+    setShowModal(false);
+    localStorage.setItem('hasSeenInstaPopup', 'true');
+  };
 
   const handleDownload = async () => {
     if (!inputValue) return;
@@ -80,12 +96,15 @@ function App() {
             >
               Posts
             </div>
-            <div 
-              className={`tab ${activeTab === 'story' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('story'); setResult(null); setInputValue(''); }}
-            >
-              Stories
-            </div>
+            {/* 
+              Stories tab hidden temporarily until RapidAPI fixes their endpoint
+              <div 
+                className={`tab ${activeTab === 'story' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('story'); setResult(null); setInputValue(''); }}
+              >
+                Stories
+              </div>
+            */}
           </div>
 
           <div className="downloader-card">
@@ -126,7 +145,7 @@ function App() {
             </button>
 
             {result && (
-              <div className="result-area">
+              <div className="result-area fade-in-up">
                 <h3 className="result-title">Ready to Download</h3>
                 
                 {result.caption && (
@@ -135,16 +154,24 @@ function App() {
                   </p>
                 )}
                 
-                <video 
-                  className="video-preview" 
-                  src={result.url} 
-                  controls 
-                  poster={result.thumbnail}
-                ></video>
+                {(result.url.includes('.mp4') || result.url.includes('video')) ? (
+                  <video 
+                    className="video-preview" 
+                    src={result.url} 
+                    controls 
+                    poster={result.thumbnail}
+                  ></video>
+                ) : (
+                  <img 
+                    className="video-preview" 
+                    src={result.url} 
+                    alt="Instagram Post Preview"
+                  />
+                )}
                 
                 <a 
                   href={result.url} 
-                  download={result.caption ? `${result.caption.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}.mp4` : 'Instagram_Video.mp4'}
+                  download={result.caption ? `${result.caption.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}` : 'Instagram_Media'}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="btn-primary btn-download" 
@@ -161,6 +188,32 @@ function App() {
       <footer className="footer">
         <p className="copyright">Created by <span>Sushant Markad</span></p>
       </footer>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="modal-close" onClick={closePopup}>
+              <X size={24} />
+            </button>
+            <div className="modal-icon">
+              <Instagram size={32} />
+            </div>
+            <h2 className="modal-title">Love InstaSave?</h2>
+            <p className="modal-text">
+              Follow the creator for more awesome tools and updates! Let's connect on Instagram.
+            </p>
+            <a 
+              href="https://instagram.com/sushhant.in" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="btn-primary btn-insta"
+              onClick={closePopup}
+            >
+              Follow @sushhant.in
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
