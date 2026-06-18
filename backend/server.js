@@ -66,7 +66,8 @@ app.post('/api/download/reel', async (req, res) => {
 
   } catch (error) {
     console.error('Error downloading reel:', error.message);
-    res.status(500).json({ error: 'Failed to process the Instagram link via Proxy API.' });
+    const apiError = error.response ? JSON.stringify(error.response.data) : error.message;
+    res.status(500).json({ error: `Failed to process via Proxy API. Details: ${apiError}` });
   }
 });
 
