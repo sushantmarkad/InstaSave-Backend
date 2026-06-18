@@ -133,9 +133,15 @@ function App() {
                   controls 
                   poster={result.thumbnail}
                 ></video>
-                <button className="btn-primary" style={{ background: 'var(--secondary)', color: '#000' }}>
+                <a 
+                  href={result.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="btn-primary" 
+                  style={{ background: 'var(--secondary)', color: '#000', textDecoration: 'none', display: 'flex', justifyContent: 'center' }}
+                >
                   <Download size={20} /> Save to Device
-                </button>
+                </a>
               </div>
             )}
           </div>
