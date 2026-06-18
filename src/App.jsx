@@ -142,7 +142,9 @@ function App() {
 
             {result && (
               <div className="result-area fade-in-up">
-                <h3 className="result-title">Ready to Download</h3>
+                <h3 className="result-title">
+                  {result.type === 'posts' ? '📸 Instagram Post Ready' : result.type === 'reels' ? '🎬 Instagram Reel Ready' : '✅ Ready to Download'}
+                </h3>
                 
                 {result.caption && (
                   <p className="video-caption">

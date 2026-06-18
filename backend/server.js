@@ -14,7 +14,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' })); // Prevent oversized request body attacks
 
 // RapidAPI Configuration
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
@@ -30,6 +30,12 @@ const handleDownload = async (req, res, type) => {
       return res.status(400).json({ error: 'URL is required' });
     }
 
+    // Security: only allow Instagram URLs
+    let parsedUrl;
+    try { parsedUrl = new URL(url); } catch { return res.status(400).json({ error: 'Invalid URL format.' }); }
+    if (!parsedUrl.hostname.endsWith('instagram.com')) {
+      return res.status(400).json({ error: 'Only Instagram URLs are allowed.' });
+    }
     if (!RAPIDAPI_KEY) {
       console.warn("No RAPIDAPI_KEY provided, returning mock data.");
       return res.json({
@@ -73,7 +79,8 @@ const handleDownload = async (req, res, type) => {
       throw new Error("Could not extract a valid video URL from the API response.");
     }
     
-    const caption = mediaData.caption || mediaData.title || mediaData.text || videoData.caption || videoData.title || 'Instagram_Video';
+    const captionFallback = type === 'posts' ? 'Instagram_Post' : type === 'reels' ? 'Instagram_Reel' : 'Instagram_Story';
+    const caption = mediaData.caption || mediaData.title || mediaData.text || videoData.caption || videoData.title || captionFallback;
     const thumbnail = mediaData.thumbnail || mediaData.thumbnail_url || mediaData.cover || mediaData.image || videoData.thumbnail || videoData.cover || null;
     
     res.json({
@@ -101,6 +108,15 @@ app.get('/api/proxy-download', async (req, res) => {
   try {
     const { url, filename, mediaType } = req.query;
     if (!url) return res.status(400).json({ error: 'URL is required' });
+
+    // Security: only proxy known Instagram CDN domains
+    let parsedProxyUrl;
+    try { parsedProxyUrl = new URL(url); } catch { return res.status(400).json({ error: 'Invalid URL.' }); }
+    const allowedDomains = ['cdninstagram.com', 'instagram.com', 'fbcdn.net', 'fbsbx.com'];
+    const isAllowed = allowedDomains.some(d => parsedProxyUrl.hostname.endsWith(d));
+    if (!isAllowed) {
+      return res.status(403).json({ error: 'Proxying this URL is not allowed.' });
+    }
 
     const response = await axios.get(url, {
       responseType: 'stream',
