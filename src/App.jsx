@@ -34,7 +34,7 @@ function App() {
       if (data.error) {
         alert(data.error);
       } else {
-        setResult(data.data);
+        setResult(data);
       }
     } catch (error) {
       console.error("Failed to connect to backend", error);
