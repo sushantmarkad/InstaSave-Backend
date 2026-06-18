@@ -166,10 +166,7 @@ function App() {
                 )}
                 
                 <a 
-                  href={result.url} 
-                  download={result.caption ? `${result.caption.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}` : 'Instagram_Media'}
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/proxy-download?url=${encodeURIComponent(result.url)}&filename=${encodeURIComponent(result.caption ? result.caption.substring(0, 40).replace(/[^a-zA-Z0-9]/g, '_') : 'InstaSave_video')}`}
                   className="btn-primary btn-download" 
                   style={{ textDecoration: 'none' }}
                 >

@@ -95,6 +95,38 @@ app.post('/api/download/reel', (req, res) => handleDownload(req, res, 'reels'));
 app.post('/api/download/story', (req, res) => handleDownload(req, res, 'story'));
 app.post('/api/download/post', (req, res) => handleDownload(req, res, 'posts'));
 
+// Proxy download endpoint — fetches the media from Instagram's CDN and
+// streams it back to the browser with headers that force a file download.
+app.get('/api/proxy-download', async (req, res) => {
+  try {
+    const { url, filename } = req.query;
+    if (!url) return res.status(400).json({ error: 'URL is required' });
+
+    const safeFilename = (filename || 'InstaSave_video').replace(/[^a-zA-Z0-9_\-]/g, '_') + '.mp4';
+
+    const response = await axios.get(url, {
+      responseType: 'stream',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://www.instagram.com/'
+      },
+      timeout: 30000
+    });
+
+    // Force the browser to download the file instead of opening it
+    res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+    res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp4');
+    if (response.headers['content-length']) {
+      res.setHeader('Content-Length', response.headers['content-length']);
+    }
+
+    response.data.pipe(res);
+  } catch (error) {
+    console.error('Proxy download error:', error.message);
+    res.status(500).json({ error: 'Failed to proxy download.' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Production Server is running on port ${PORT}`);
 });
