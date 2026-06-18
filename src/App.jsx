@@ -58,9 +58,9 @@ function App() {
             <Camera className="logo-icon" size={32} />
             InstaSave
           </div>
-          <button className="btn-icon">
-            <PlayCircle size={24} />
-          </button>
+          <div className="copyright-badge">
+            Created by Sushant Markad
+          </div>
         </header>
 
         <main className="main-content">
@@ -127,6 +127,11 @@ function App() {
                 <h3 style={{ textAlign: 'left', fontSize: '1.2rem', fontWeight: 600 }}>
                   Ready to Download
                 </h3>
+                {result.caption && (
+                  <p className="video-caption" style={{ textAlign: 'left', fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)', marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {result.caption}
+                  </p>
+                )}
                 <video 
                   className="video-preview" 
                   src={result.url} 
@@ -135,6 +140,7 @@ function App() {
                 ></video>
                 <a 
                   href={result.url} 
+                  download={result.caption ? `${result.caption.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}.mp4` : 'Instagram_Video.mp4'}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="btn-primary" 

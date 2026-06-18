@@ -77,11 +77,15 @@ app.post('/api/download/reel', async (req, res) => {
       throw new Error("Could not extract a valid video URL from the API response.");
     }
     
+    // Try to extract a caption or title from the API response to use as the filename
+    const caption = mediaData.caption || mediaData.title || mediaData.text || videoData.caption || videoData.title || 'Instagram_Video';
+    
     res.json({
       type: 'reels',
       url: mediaUrl,
       thumbnail: videoData.thumbnail || 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=1000&auto=format&fit=crop',
-      username: 'instagram_user'
+      username: 'instagram_user',
+      caption: caption
     });
 
   } catch (error) {
