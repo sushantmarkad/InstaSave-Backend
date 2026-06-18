@@ -269,9 +269,8 @@ body {
   overflow: hidden;
   background: var(--bg-main);
   border: 1px solid var(--border-color);
-  aspect-ratio: 9/16;
-  max-height: 450px;
-  object-fit: cover;
+  max-height: 500px;
+  object-fit: contain;
 }
 
 /* Footer */

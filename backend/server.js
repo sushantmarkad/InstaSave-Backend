@@ -74,11 +74,12 @@ const handleDownload = async (req, res, type) => {
     }
     
     const caption = mediaData.caption || mediaData.title || mediaData.text || videoData.caption || videoData.title || 'Instagram_Video';
+    const thumbnail = mediaData.thumbnail || mediaData.thumbnail_url || mediaData.cover || mediaData.image || videoData.thumbnail || videoData.cover || null;
     
     res.json({
       type: type,
       url: mediaUrl,
-      thumbnail: videoData.thumbnail || 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=1000&auto=format&fit=crop',
+      thumbnail: thumbnail,
       username: 'instagram_user',
       caption: caption
     });
