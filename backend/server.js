@@ -109,13 +109,16 @@ app.get('/api/proxy-download', async (req, res) => {
     const { url, filename, mediaType } = req.query;
     if (!url) return res.status(400).json({ error: 'URL is required' });
 
-    // Security: only proxy known Instagram CDN domains
+    // Security: block SSRF — reject non-HTTPS and private/internal network URLs
     let parsedProxyUrl;
     try { parsedProxyUrl = new URL(url); } catch { return res.status(400).json({ error: 'Invalid URL.' }); }
-    const allowedDomains = ['cdninstagram.com', 'instagram.com', 'fbcdn.net', 'fbsbx.com'];
-    const isAllowed = allowedDomains.some(d => parsedProxyUrl.hostname.endsWith(d));
-    if (!isAllowed) {
-      return res.status(403).json({ error: 'Proxying this URL is not allowed.' });
+    if (parsedProxyUrl.protocol !== 'https:') {
+      return res.status(400).json({ error: 'Only HTTPS URLs are allowed.' });
+    }
+    const hostname = parsedProxyUrl.hostname;
+    const privatePatterns = [/^localhost$/, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./, /^0\.0\.0\.0$/];
+    if (privatePatterns.some(p => p.test(hostname))) {
+      return res.status(403).json({ error: 'Access to internal network is not allowed.' });
     }
 
     const response = await axios.get(url, {
