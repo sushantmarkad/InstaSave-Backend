@@ -40,11 +40,11 @@ app.post('/api/download/reel', async (req, res) => {
       });
     }
 
-    // Call the Managed Scraper API (Bypasses Instagram Firewall)
+    // Call the Managed Scraper API
     const options = {
       method: 'GET',
-      url: `https://${RAPIDAPI_HOST}/index`,
-      params: { url: url },
+      url: `https://${RAPIDAPI_HOST}/instagram/`, // Updated endpoint for this specific API
+      params: { url: url }, // Some APIs use 'url', 'ig', or 'link'
       headers: {
         'X-RapidAPI-Key': RAPIDAPI_KEY,
         'X-RapidAPI-Host': RAPIDAPI_HOST
@@ -52,15 +52,24 @@ app.post('/api/download/reel', async (req, res) => {
     };
 
     const response = await axios.request(options);
-    
-    // Parse the API response (Note: different APIs have different response structures)
-    // We assume the API returns an array of media or a direct media link
     const videoData = response.data;
+
+    // Check if the API returned an error inside a 200 OK
+    if (videoData.status === false) {
+      throw new Error(videoData.message || "Invalid URL or API rejected the request.");
+    }
+    
+    // Parse the API response (this API seems to return data in 'result' if successful)
+    const mediaUrl = videoData.result || videoData.media || videoData[0]?.url || videoData.video_url;
+    
+    if (!mediaUrl) {
+      throw new Error("Could not find video URL in the API response.");
+    }
     
     res.json({
       type: 'reels',
-      url: videoData.media || videoData[0]?.url, // Adjust based on the specific API you choose
-      thumbnail: videoData.thumbnail,
+      url: mediaUrl,
+      thumbnail: videoData.thumbnail || 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=1000&auto=format&fit=crop',
       username: 'instagram_user'
     });
 
