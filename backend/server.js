@@ -62,7 +62,7 @@ const handleDownload = async (req, res, type) => {
     let mediaUrl = '';
     
     if (Array.isArray(mediaData)) {
-      mediaUrl = mediaData[0]?.url || mediaData[0]?.video_url || mediaData[0]?.media || mediaData[0];
+      mediaUrl = mediaData[0]?.video_url || mediaData[0]?.url || mediaData[0]?.media || mediaData[0];
     } else if (typeof mediaData === 'object' && mediaData !== null) {
       mediaUrl = mediaData.video_url || mediaData.url || mediaData.media;
     } else if (typeof mediaData === 'string') {

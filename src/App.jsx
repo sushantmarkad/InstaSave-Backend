@@ -10,18 +10,14 @@ function App() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const hasSeenPopup = localStorage.getItem('hasSeenInstaPopup');
-    if (!hasSeenPopup) {
-      const timer = setTimeout(() => {
-        setShowModal(true);
-      }, 2000); // Show popup after 2 seconds
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => {
+      setShowModal(true);
+    }, 2000); // Show popup after 2 seconds
+    return () => clearTimeout(timer);
   }, []);
 
   const closePopup = () => {
     setShowModal(false);
-    localStorage.setItem('hasSeenInstaPopup', 'true');
   };
 
   const handleDownload = async () => {
@@ -77,10 +73,10 @@ function App() {
         <main className="main-content">
           <h1 className="hero-title">
             Download <span>High Quality</span><br />
-            Stories, Posts & Reels
+            Posts & Reels
           </h1>
           <p className="hero-subtitle">
-            Save any public Instagram media in maximum resolution with the original audio track intact. Fast, secure, and free.
+            Save any public Instagram Post or Reel in maximum resolution with the original audio track intact. Fast, secure, and free.
           </p>
 
           <div className="tabs">
