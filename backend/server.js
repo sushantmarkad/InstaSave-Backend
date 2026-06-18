@@ -99,10 +99,8 @@ app.post('/api/download/post', (req, res) => handleDownload(req, res, 'posts'));
 // streams it back to the browser with headers that force a file download.
 app.get('/api/proxy-download', async (req, res) => {
   try {
-    const { url, filename } = req.query;
+    const { url, filename, mediaType } = req.query;
     if (!url) return res.status(400).json({ error: 'URL is required' });
-
-    const safeFilename = (filename || 'InstaSave_video').replace(/[^a-zA-Z0-9_\-]/g, '_') + '.mp4';
 
     const response = await axios.get(url, {
       responseType: 'stream',
@@ -113,9 +111,21 @@ app.get('/api/proxy-download', async (req, res) => {
       timeout: 30000
     });
 
+    // Detect the real content type from the server response
+    const contentType = response.headers['content-type'] || '';
+    let ext = '.mp4';
+    if (contentType.includes('image/jpeg')) ext = '.jpg';
+    else if (contentType.includes('image/png')) ext = '.png';
+    else if (contentType.includes('image/webp')) ext = '.webp';
+    else if (contentType.includes('video/mp4')) ext = '.mp4';
+    else if (mediaType === 'image') ext = '.jpg'; // fallback hint from frontend
+
+    const safeBase = (filename || 'InstaSave').replace(/[^a-zA-Z0-9_\-]/g, '_');
+    const safeFilename = safeBase + ext;
+
     // Force the browser to download the file instead of opening it
     res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
-    res.setHeader('Content-Type', response.headers['content-type'] || 'video/mp4');
+    res.setHeader('Content-Type', contentType || 'application/octet-stream');
     if (response.headers['content-length']) {
       res.setHeader('Content-Length', response.headers['content-length']);
     }

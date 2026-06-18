@@ -166,7 +166,7 @@ function App() {
                 )}
                 
                 <a 
-                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/proxy-download?url=${encodeURIComponent(result.url)}&filename=${encodeURIComponent(result.caption ? result.caption.substring(0, 40).replace(/[^a-zA-Z0-9]/g, '_') : 'InstaSave_video')}`}
+                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/proxy-download?url=${encodeURIComponent(result.url)}&filename=${encodeURIComponent(result.caption ? result.caption.substring(0, 40).replace(/[^a-zA-Z0-9]/g, '_') : 'InstaSave')}&mediaType=${(result.url.includes('.mp4') || result.url.includes('video')) ? 'video' : 'image'}`}
                   className="btn-primary btn-download" 
                   style={{ textDecoration: 'none' }}
                 >
