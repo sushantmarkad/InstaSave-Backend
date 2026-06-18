@@ -15,8 +15,11 @@ function App() {
     setResult(null);
 
     try {
-      const endpoint = activeTab === 'reels' ? '/api/download/reel' : '/api/download/story';
-      const payload = activeTab === 'reels' ? { url: inputValue } : { username: inputValue };
+      let endpoint = '/api/download/reel';
+      if (activeTab === 'story') endpoint = '/api/download/story';
+      if (activeTab === 'posts') endpoint = '/api/download/post';
+      
+      const payload = { url: inputValue };
 
       // Use environment variable for production, fallback to localhost for development
       const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -53,7 +56,7 @@ function App() {
       </div>
 
       <div className="container">
-        <header className="header">
+        <header className="header" style={{ flexWrap: 'wrap', gap: '16px' }}>
           <div className="logo">
             <Camera className="logo-icon" size={32} />
             InstaSave
@@ -66,10 +69,10 @@ function App() {
         <main className="main-content">
           <h1 className="hero-title">
             Download High Quality<br />
-            <span>Stories & Reels</span>
+            <span>Stories, Posts & Reels</span>
           </h1>
           <p className="hero-subtitle">
-            Save any public Instagram Reel or Story in maximum resolution with the original audio track intact.
+            Save any public Instagram Reel, Post, or Story in maximum resolution with the original audio track intact.
           </p>
 
           <div className="tabs">
@@ -85,11 +88,17 @@ function App() {
             >
               Public Stories
             </div>
+            <div 
+              className={`tab ${activeTab === 'posts' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('posts'); setResult(null); setInputValue(''); }}
+            >
+              Posts
+            </div>
           </div>
 
           <div className="glass-panel downloader-card">
             <div className="input-group">
-              {activeTab === 'reels' ? (
+              {activeTab === 'reels' || activeTab === 'posts' ? (
                 <Link2 className="input-icon" size={20} />
               ) : (
                 <Search className="input-icon" size={20} />
@@ -97,7 +106,11 @@ function App() {
               <input 
                 type="text" 
                 className="glass-input" 
-                placeholder={activeTab === 'reels' ? "Paste Instagram Reel link here..." : "Enter public Instagram username (e.g. @therock)"}
+                placeholder={
+                  activeTab === 'reels' ? "Paste Instagram Reel link here..." : 
+                  activeTab === 'posts' ? "Paste Instagram Post link here..." :
+                  "Paste Instagram Story link here..."
+                }
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleDownload()}
@@ -116,7 +129,7 @@ function App() {
                 </>
               ) : (
                 <>
-                  <Download size={20} /> Download {activeTab === 'reels' ? 'Reel' : 'Stories'}
+                  <Download size={20} /> Download {activeTab === 'reels' ? 'Reel' : activeTab === 'posts' ? 'Post' : 'Story'}
                 </>
               )}
             </button>
