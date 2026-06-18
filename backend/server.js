@@ -21,7 +21,7 @@ const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 // We are using a popular free Instagram Downloader API on RapidAPI.
 // Make sure to subscribe to an API like "Instagram Downloader" on RapidAPI and get the host URL.
 // Example API: https://rapidapi.com/backend-api/api/instagram-downloader-download-instagram-videos-stories
-const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST || 'instagram-downloader-download-instagram-videos-stories.p.rapidapi.com';
+const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST || 'instagram-post-reels-stories-downloader-api.p.rapidapi.com';
 
 app.post('/api/download/reel', async (req, res) => {
   try {
