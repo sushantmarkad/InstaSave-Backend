@@ -59,11 +59,22 @@ app.post('/api/download/reel', async (req, res) => {
       throw new Error(videoData.message || "Invalid URL or API rejected the request.");
     }
     
-    // Parse the API response (this API seems to return data in 'result' if successful)
-    const mediaUrl = videoData.result || videoData.media || videoData[0]?.url || videoData.video_url;
+    // Parse the API response defensively
+    let mediaData = videoData.result || videoData.media || videoData.data || videoData;
+    let mediaUrl = '';
     
-    if (!mediaUrl) {
-      throw new Error("Could not find video URL in the API response.");
+    if (Array.isArray(mediaData)) {
+      // If the API returns an array (like a carousel), grab the first item
+      mediaUrl = mediaData[0]?.url || mediaData[0]?.video_url || mediaData[0]?.media || mediaData[0];
+    } else if (typeof mediaData === 'object' && mediaData !== null) {
+      // If it returns an object, look for standard URL keys
+      mediaUrl = mediaData.video_url || mediaData.url || mediaData.media;
+    } else if (typeof mediaData === 'string') {
+      mediaUrl = mediaData;
+    }
+    
+    if (!mediaUrl || typeof mediaUrl !== 'string') {
+      throw new Error("Could not extract a valid video URL from the API response.");
     }
     
     res.json({
